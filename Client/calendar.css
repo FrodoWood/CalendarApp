@@ -1,0 +1,62 @@
+.calendar-container {
+  width: 100%;
+  height: 100%;
+}
+.calendar-body ul {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0px;
+}
+
+.days {
+}
+
+.calendar-body li {
+  box-sizing: border-box;
+  width: calc(100% / 7);
+  height: 40px;
+  background-color: #f6f6f6;
+  border: 1px solid #dcdcdc;
+  list-style-type: none;
+  text-align: center;
+}
+.calendar-body .days li {
+  box-sizing: border-box;
+  width: calc(100% / 7);
+  min-height: calc(80vh / 6);
+  height: auto;
+  background-color: #fcfcfc;
+  border: 1px solid #dcdcdc;
+  list-style-type: none;
+  text-align: start;
+}
+
+.calendar-body .days .inactive {
+  box-sizing: border-box;
+  width: calc(100% / 7);
+  min-height: calc(80vh / 6);
+  height: auto;
+  background-color: #eeeeee;
+  border: 1px solid #dcdcdc;
+  list-style-type: none;
+  text-align: start;
+}
+
+.calendar-body .days li:hover {
+  /* background-color: rgb(217, 217, 217); */
+  border-color: rgba(70, 121, 163, 0);
+  border-width: 1px;
+  outline: 2px solid rgb(70, 121, 163);
+  outline-style: solid;
+  z-index: 3;
+}
+
+.day-box-event {
+  font-size: 0.8rem;
+}
+
+.outline {
+  outline: 2px solid rgb(70, 121, 163);
+  outline-style: solid;
+  z-index: 3;
+}
