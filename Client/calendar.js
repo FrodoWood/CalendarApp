@@ -28,7 +28,6 @@ let currentDate = document.querySelector(".current-date");
 let controlButtons = document.querySelectorAll(".calendar-controls button");
 let modal = document.getElementById("staticBackdrop");
 let modalInput = document.getElementById("newEventInput");
-let allEvents = document.getElementById("all-events");
 
 updateDates(); // Creates the grid of dates
 refreshEvents(); // Fetches the data and renders the box events and
@@ -72,7 +71,7 @@ async function createEvent(event) {
   return await response.json();
 }
 
-async function deleteEvent(eventId) {
+async function removeEvent(eventId) {
   const response = await fetch(`${apiUrl}/${eventId}`, {
     method: "DELETE",
     headers: {
@@ -92,7 +91,18 @@ function refreshEvents() {
       // console.log(events);
       // Re-render all events in boxes
       showBoxEvents();
-      let storedEvents = events.filter((event) => event.date === "2024-10-17");
+      // let storedEvents = events.filter((event) => event.date === "2024-10-17");
+      // console.log(storedEvents);
+    })
+    .catch((error) => console.log("Caught error", error));
+}
+function refreshEventsData() {
+  fetchEvents()
+    .then((data) => {
+      events = data;
+      // console.log(events);
+      // Re-render all events in boxes
+      // let storedEvents = events.filter((event) => event.date === "2024-10-17");
       // console.log(storedEvents);
     })
     .catch((error) => console.log("Caught error", error));
@@ -150,6 +160,7 @@ function showBoxEvents() {
 
 function showEvents(key) {
   // Clear modal
+  let allEvents = document.getElementById("all-events");
   allEvents.innerHTML = "";
   let dayBox = document.querySelector(
     `.days li[data-date='${key}'] .day-box-events`
@@ -165,25 +176,24 @@ function showEvents(key) {
     allEvents.innerHTML = "<h3>No events added.</h3>";
     return;
   }
-  // storedEvents = JSON.parse(storedEvents);
-  // console.log(storedEvents);
-  // console.log(storedEvents[0]);
+
   allEvents.innerHTML += "<h4>Your Events<h4?>";
 
-  storedEvents.forEach((event, index) => {
-    // console.log(event.title);
+  // console.log(storedEvents);
 
+  storedEvents.forEach((event, index) => {
     eventElement = `<div class="card">
-                      <div class="row card-body m-0 py-2">
-                        <div class="col-10 align-content-center">
-                          <p class="m-0">${event.title}</p>
-                        </div>
-                        <div class="col-2 p-0 align-content-center">
-                          <button onclick="deleteEvent(event)" data-date="${key}" data-event-index="${index}"
-                            class="btn btn-outline-danger">Delete</button>
-                        </div>
-                      </div>
-                    </div>`;
+    <div class="row card-body m-0 py-2">
+      <div class="col-10 align-content-center">
+        <p class="m-0">${event.title}</p>
+      </div>
+      <div class="col-2 p-0 align-content-center">
+        <button onclick="deleteEvent(event)" data-date="${key}" data-event-index="${index}"
+          class="btn btn-outline-danger">Delete</button>
+      </div>
+    </div>
+  </div>`;
+    // console.log(event.title);
     allEvents.innerHTML += eventElement;
     // let dayBox = document.querySelector(`.days li[data-date='${key}']`);
     dayBox.innerHTML += `<p class="day-box-event bg-primary text-light px-1 mb-1">${
@@ -205,7 +215,8 @@ function addEvent() {
   createEvent(newEvent)
     .then(() => {
       events.push(newEvent);
-      refreshEvents();
+      refreshEventsData();
+      showEvents(key);
     })
     .catch((error) => {
       console.log(error);
@@ -217,24 +228,34 @@ function addEvent() {
   // localStorage.setItem(key, JSON.stringify(storedEvents));
 
   modalInput.value = "";
-  showEvents(key);
 }
 
 function deleteEvent(event) {
   button = event.target;
   key = button.getAttribute("data-date");
   eventIndex = button.getAttribute("data-event-index");
+  let storedEvents = events.filter((event) => event.date === key);
+  let eventToDelete = storedEvents[eventIndex];
+  // console.log(eventToDelete);
 
-  let storedEvents = localStorage.getItem(key);
-  storedEvents = storedEvents ? JSON.parse(storedEvents) : [];
-  storedEvents.splice(eventIndex, 1);
-  if (storedEvents.length == 0) {
-    localStorage.removeItem(key);
-  } else {
-    localStorage.setItem(key, JSON.stringify(storedEvents));
-  }
+  removeEvent(eventToDelete.id)
+    .then(() => {
+      events = events.filter((e) => e.id !== eventToDelete.id);
+      refreshEventsData();
+      showEvents(key);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 
-  showEvents(key);
+  // let storedEvents = localStorage.getItem(key);
+  // storedEvents = storedEvents ? JSON.parse(storedEvents) : [];
+  // storedEvents.splice(eventIndex, 1);
+  // if (storedEvents.length == 0) {
+  //   localStorage.removeItem(key);
+  // } else {
+  //   localStorage.setItem(key, JSON.stringify(storedEvents));
+  // }
 }
 
 controlButtons.forEach((button) => {
