@@ -1,3 +1,8 @@
+const apiUrl = "https://localhost:7271/api/events";
+const apiAuthUrl = "https://localhost:7271/api/account";
+let token =
+  "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyOTc0MGQxNC02NWE4LTRkMjMtYjIyYy0wNDAyNmUzYzQzYzQiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJnaXZlbl9uYW1lIjoidGVzdCIsIm5iZiI6MTcyOTIxNTIxNSwiZXhwIjoxNzI5ODIwMDE1LCJpYXQiOjE3MjkyMTUyMTUsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcyNzEiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MjcxIn0.HSOBfalfa2q-eXLOl3QrSs43Fw92oo2lH-eIryqUL7OZMTdlsjpPk0oOg2Ej6Zzr67a7Q8MRo19RVcAzx1U3Zw";
+
 const months = [
   "January",
   "February",
@@ -13,13 +18,10 @@ const months = [
   "December",
 ];
 
+let events = [];
 let date = new Date();
 let month = date.getMonth();
 let year = date.getFullYear();
-
-// console.log("date", date);
-// console.log("month", month);
-// console.log("year", year);
 
 let days = document.querySelector(".days");
 let currentDate = document.querySelector(".current-date");
@@ -31,6 +33,83 @@ let allEvents = document.getElementById("all-events");
 // create all the days to show
 updateDates();
 showBoxEvents();
+
+async function fetchEvents() {
+  try {
+    const response = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch events");
+    }
+
+    data = await response.json();
+    return data;
+  } catch (error) {
+    console.log("Failed to fetch data", error);
+  }
+}
+
+async function createEvent(event) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(event),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create new event");
+  }
+
+  return await response.json();
+}
+
+async function deleteEvent(eventId) {
+  const response = await fetch(`${url}/${eventId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete event");
+  }
+}
+
+function refreshEvents() {
+  fetchEvents()
+    .then((data) => {
+      events = data;
+      // Re-render all events in boxes
+    })
+    .catch((error) => console.log("Caught error", error));
+}
+
+async function login(username, password) {
+  const response = await fetch(apiAuthUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to log in");
+  }
+
+  const data = await response.json();
+  token = data.token;
+}
 
 modal.addEventListener("show.bs.modal", (event) => {
   let button = event.relatedTarget;
