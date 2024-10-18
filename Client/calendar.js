@@ -1,7 +1,7 @@
 window.onload = function () {
   const token = localStorage.getItem("token");
   if (!token) {
-    window.location.href = "/auth.html";
+    window.location.href = "./auth.html";
     return;
   }
 };
@@ -118,7 +118,7 @@ function refreshEventsData() {
 document.getElementById("logout").addEventListener("click", function () {
   localStorage.removeItem("token");
   events = [];
-  window.location.href = "/auth.html";
+  window.location.href = "./auth.html";
 });
 
 modal.addEventListener("show.bs.modal", (event) => {

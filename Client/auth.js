@@ -1,7 +1,7 @@
 window.onload = function () {
   const token = localStorage.getItem("token");
   if (token) {
-    window.location.href = "/calendar.html";
+    window.location.href = "./calendar.html";
     return;
   }
 };
@@ -21,7 +21,7 @@ document
       await login(username, password).then((data) => {
         let token = data.token;
         localStorage.setItem("token", token);
-        window.location.href = "/calendar.html";
+        window.location.href = "./calendar.html";
       });
     } catch (error) {
       console.error(error);
@@ -42,7 +42,7 @@ document
       await register(username, email, password).then((data) => {
         let token = data.token;
         localStorage.setItem("token", token);
-        window.location.href = "/calendar.html";
+        window.location.href = "./calendar.html";
       });
     } catch (error) {
       console.error(error);
@@ -58,7 +58,17 @@ async function login(username, password) {
     body: JSON.stringify({ username, password }),
   });
 
+  const loginErrorElement = document.getElementById("login-error-message");
   if (!response.ok) {
+    loginErrorElement.textContent = "*Username or password not found/incorrect";
+    loginErrorElement.classList.add(
+      "bg-danger",
+      "text-light",
+      "rounded-2",
+      "mt-2",
+      "px-2"
+    );
+    loginErrorElement.style.display = "block";
     throw new Error("Failed to log in");
   }
 
@@ -75,8 +85,21 @@ async function register(username, email, password) {
     body: JSON.stringify({ username, email, password }),
   });
 
+  const registerErrorElement = document.getElementById(
+    "register-error-message"
+  );
   if (!response.ok) {
-    throw new Error("Failed to log in");
+    registerErrorElement.textContent =
+      "*Failed to create new account. Please try again with different username and/or email.";
+    registerErrorElement.classList.add(
+      "bg-danger",
+      "text-light",
+      "rounded-2",
+      "mt-2",
+      "px-2"
+    );
+    registerErrorElement.style.display = "block";
+    throw new Error("Failed to register");
   }
 
   const data = await response.json();

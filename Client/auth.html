@@ -13,10 +13,13 @@
 
 <body>
     <div class="container">
-        <h3 class="text-center bg-body-secondary text-dark rounded-2 m-3 p-3">Gemporia Technical
-            Assignment
-            - Jasraj
-            Singh</h3>
+        <div class="text-center bg-body-secondary text-dark rounded-2 m-3 p-3">
+            <h4 class="">Full-Stack Calendar
+                App
+                (ASP.NET Core 8,
+                JWT Authentication, PostgreSQL, JavaScript, Bootstrap)</h4>
+            <h5>Made by: Jasraj Singh </h5>
+        </div>
     </div>
     <div id="auth-container" class="d-flex justify-content-center">
         <div class="row container mt-5">
@@ -36,6 +39,7 @@
                                 <label for="password">Password</label>
                             </div>
                             <button class="btn btn-primary mt-3" type="submit">Login</button>
+                            <p id="login-error-message" class="fs-5"></p>
                         </form>
                     </div>
                 </div>
@@ -47,23 +51,23 @@
                     </div>
                     <div class="card-body">
                         <form id="register-form">
-                            <!-- <input type="text" name="reg-username" id="reg-username" required>
-                            <input type="email" name="reg-email" id="reg-email" required>
-                            <input type="password" name="reg-password" id="reg-password" required> -->
-
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control" id="reg-username" placeholder="">
+                                <input type="text" class="form-control" id="reg-username" placeholder="" required>
                                 <label for="reg-username">Username</label>
                             </div>
                             <div class="form-floating mb-3">
-                                <input type="email" class="form-control" id="reg-email" placeholder="">
+                                <input type="email" class="form-control" id="reg-email" placeholder="" required>
                                 <label for="reg-email">Email</label>
                             </div>
                             <div class="form-floating">
-                                <input type="password" class="form-control" id="reg-password" placeholder="Password">
+                                <input type="password" class="form-control" id="reg-password" placeholder="Password"
+                                    minlength="8" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}"
+                                    title="Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character."
+                                    required>
                                 <label for="reg-password">Password</label>
                             </div>
                             <button class="btn btn-primary mt-3" type="submit">Register</button>
+                            <p id="register-error-message" class="fs-5"></p>
                         </form>
                     </div>
                 </div>
