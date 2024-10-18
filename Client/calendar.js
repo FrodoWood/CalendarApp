@@ -198,6 +198,14 @@ function showEvents(key) {
   });
 }
 
+document
+  .getElementById("newEventInput")
+  .addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      addEvent();
+    }
+  });
+
 function addEvent() {
   let title = modalInput.value;
   if (title === "") return;

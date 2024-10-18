@@ -1,3 +1,11 @@
+window.onload = function () {
+  const token = localStorage.getItem("token");
+  if (token) {
+    window.location.href = "/calendar.html";
+    return;
+  }
+};
+
 const apiAuthUrl = "https://localhost:7271/api/account";
 
 // LOGIN
