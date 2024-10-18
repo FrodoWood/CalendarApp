@@ -1,7 +1,14 @@
+window.onload = function () {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    window.location.href = "/auth.html";
+    return;
+  }
+};
+
 const apiUrl = "https://localhost:7271/api/events";
 const apiAuthUrl = "https://localhost:7271/api/account";
-let token =
-  "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyOTc0MGQxNC02NWE4LTRkMjMtYjIyYy0wNDAyNmUzYzQzYzQiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJnaXZlbl9uYW1lIjoidGVzdCIsIm5iZiI6MTcyOTIxNTIxNSwiZXhwIjoxNzI5ODIwMDE1LCJpYXQiOjE3MjkyMTUyMTUsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcyNzEiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MjcxIn0.HSOBfalfa2q-eXLOl3QrSs43Fw92oo2lH-eIryqUL7OZMTdlsjpPk0oOg2Ej6Zzr67a7Q8MRo19RVcAzx1U3Zw";
+let token = localStorage.getItem("token");
 
 const months = [
   "January",
@@ -108,22 +115,11 @@ function refreshEventsData() {
     .catch((error) => console.log("Caught error", error));
 }
 
-async function login(username, password) {
-  const response = await fetch(apiAuthUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ username, password }),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to log in");
-  }
-
-  const data = await response.json();
-  token = data.token;
-}
+document.getElementById("logout").addEventListener("click", function () {
+  localStorage.removeItem("token");
+  events = [];
+  window.location.href = "/auth.html";
+});
 
 modal.addEventListener("show.bs.modal", (event) => {
   let button = event.relatedTarget;
