@@ -30,9 +30,9 @@ let modal = document.getElementById("staticBackdrop");
 let modalInput = document.getElementById("newEventInput");
 let allEvents = document.getElementById("all-events");
 
-// create all the days to show
-updateDates();
-showBoxEvents();
+updateDates(); // Creates the grid of dates
+refreshEvents(); // Fetches the data and renders the box events and
+// showBoxEvents();
 
 async function fetchEvents() {
   try {
@@ -56,7 +56,7 @@ async function fetchEvents() {
 }
 
 async function createEvent(event) {
-  const response = await fetch(url, {
+  const response = await fetch(apiUrl, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -73,7 +73,7 @@ async function createEvent(event) {
 }
 
 async function deleteEvent(eventId) {
-  const response = await fetch(`${url}/${eventId}`, {
+  const response = await fetch(`${apiUrl}/${eventId}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -89,7 +89,11 @@ function refreshEvents() {
   fetchEvents()
     .then((data) => {
       events = data;
+      // console.log(events);
       // Re-render all events in boxes
+      showBoxEvents();
+      let storedEvents = events.filter((event) => event.date === "2024-10-17");
+      // console.log(storedEvents);
     })
     .catch((error) => console.log("Caught error", error));
 }
@@ -154,21 +158,25 @@ function showEvents(key) {
   // Clear day box in calendar grid
   dayBox.innerHTML = "";
 
-  let storedEvents = localStorage.getItem(key);
-  if (storedEvents == null) {
+  // let storedEvents = localStorage.getItem(key);
+  let storedEvents = events.filter((event) => event.date === key);
+  // console.log(key, storedEvents);
+  if (storedEvents == null || storedEvents.length == 0) {
     allEvents.innerHTML = "<h3>No events added.</h3>";
     return;
   }
-
-  storedEvents = JSON.parse(storedEvents);
+  // storedEvents = JSON.parse(storedEvents);
   // console.log(storedEvents);
+  // console.log(storedEvents[0]);
   allEvents.innerHTML += "<h4>Your Events<h4?>";
 
   storedEvents.forEach((event, index) => {
+    // console.log(event.title);
+
     eventElement = `<div class="card">
                       <div class="row card-body m-0 py-2">
                         <div class="col-10 align-content-center">
-                          <p class="m-0">${event}</p>
+                          <p class="m-0">${event.title}</p>
                         </div>
                         <div class="col-2 p-0 align-content-center">
                           <button onclick="deleteEvent(event)" data-date="${key}" data-event-index="${index}"
@@ -179,23 +187,36 @@ function showEvents(key) {
     allEvents.innerHTML += eventElement;
     // let dayBox = document.querySelector(`.days li[data-date='${key}']`);
     dayBox.innerHTML += `<p class="day-box-event bg-primary text-light px-1 mb-1">${
-      event.length > 40 ? event.slice(0, 40) + "..." : event
+      event.title.length > 40 ? event.title.slice(0, 40) + "..." : event.title
     }</p>`;
   });
 }
 
 function addEvent() {
-  let newEvent = modalInput.value;
-  if (newEvent === "") {
-    return;
-  }
+  let title = modalInput.value;
+  if (title === "") return;
   let key = modal.getAttribute("data-date");
-  let storedEvents = localStorage.getItem(key);
-  storedEvents = storedEvents ? JSON.parse(storedEvents) : [];
-  storedEvents.push(newEvent);
-  modalInput.value = "";
 
-  localStorage.setItem(key, JSON.stringify(storedEvents));
+  let newEvent = {
+    title: modalInput.value,
+    date: key,
+  };
+
+  createEvent(newEvent)
+    .then(() => {
+      events.push(newEvent);
+      refreshEvents();
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
+  // let storedEvents = localStorage.getItem(key);
+  // storedEvents = storedEvents ? JSON.parse(storedEvents) : [];
+  // storedEvents.push(newEvent);
+  // localStorage.setItem(key, JSON.stringify(storedEvents));
+
+  modalInput.value = "";
   showEvents(key);
 }
 
@@ -265,6 +286,7 @@ function updateDates() {
     dayBox.className = "inactive";
     dayBox.textContent = noDaysPrevMonth - i + 1;
     key = `${currentYear}-${currentMonth + 1}-${noDaysPrevMonth - i + 1}`;
+    key = formatDateString(key);
     dayBox.setAttribute("data-date", key);
     dayBox.setAttribute("data-bs-toggle", "modal");
     dayBox.setAttribute("data-bs-target", "#staticBackdrop");
@@ -285,6 +307,7 @@ function updateDates() {
     let dayBox = document.createElement("li");
     dayBox.textContent = i;
     key = `${currentYear}-${currentMonth + 1}-${i}`;
+    key = formatDateString(key);
     dayBox.setAttribute("data-date", key);
     dayBox.setAttribute("data-bs-toggle", "modal");
     dayBox.setAttribute("data-bs-target", "#staticBackdrop");
@@ -305,6 +328,7 @@ function updateDates() {
     let dayBox = document.createElement("li");
     dayBox.textContent = i;
     key = `${currentYear}-${currentMonth + 1}-${i}`;
+    key = formatDateString(key);
     dayBox.setAttribute("data-date", key);
     dayBox.setAttribute("data-bs-toggle", "modal");
     dayBox.setAttribute("data-bs-target", "#staticBackdrop");
@@ -324,4 +348,13 @@ function updateDates() {
 
     days.appendChild(dayBox);
   });
+}
+
+function formatDateString(dateString) {
+  const [year, month, day] = dateString.split("-");
+
+  const fixedMonth = month.padStart(2, "0");
+  const fixedDay = day.padStart(2, "0");
+
+  return `${year}-${fixedMonth}-${fixedDay}`;
 }
